@@ -3,6 +3,23 @@ import sublime_plugin
 
 class JasmineScaffoldCommand(sublime_plugin.TextCommand):
 
+	# return user settings
+	def getSettings(self):
+		return self.view.settings()
+
+    # whether tabs are being transpated to spaces or not
+    # return boolean
+	def translatingTabsToSpaces(self):
+		getSettings()
+		return settings.get('translate_tabs_to_spaces')
+
+	# counts the spacing being used
+	# return int
+	def spacingCount(self):
+		getSettings()
+		return settings.get('tab_size')
+
+	# main
 	def run(self, edit):
 
 		settings = self.view.settings()
@@ -44,7 +61,7 @@ class JasmineScaffoldCommand(sublime_plugin.TextCommand):
 				whitespaceDiff = (previousWhitespace - currentWhitespace)
 				while whitespaceDiff > 0:
 					whitespaceDiff -= spaceSize
-					newLines.append('1});'.rjust(3 + (whitespaceDiff + currentWhitespace) * spaceSize) + '\n\n')
+					newLines.append('});'.rjust(3 + (whitespaceDiff + currentWhitespace) * spaceSize) + '\n\n')
 
 			# if the current line's whitespace is larger than the next we have an
 			# 'it should' block, else it's a 'describe' block
