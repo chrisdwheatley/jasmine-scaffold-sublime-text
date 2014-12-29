@@ -1,7 +1,7 @@
 import sublime
 import sublime_plugin
 
-class JazzCommand(sublime_plugin.TextCommand):
+class JasmineScaffoldCommand(sublime_plugin.TextCommand):
 
 	def run(self, edit):
 
