@@ -3,35 +3,55 @@ import sublime_plugin
 
 class JasmineScaffoldCommand(sublime_plugin.TextCommand):
 
-	# return user settings
-	def getSettings(self):
-		return self.view.settings()
-
-    # whether tabs are being transpated to spaces or not
+    # whether tabs are being translated to spaces or not
     # return boolean
 	def translatingTabsToSpaces(self):
-		getSettings()
-		return settings.get('translate_tabs_to_spaces')
+		return self.view.settings().get('translate_tabs_to_spaces')
 
 	# counts the spacing being used
 	# return int
-	def spacingCount(self):
-		getSettings()
-		return settings.get('tab_size')
+	def spacingSetting(self):
+		return self.view.settings().get('tab_size')
+
+	# count the number of whitespace characters at the start of each line
+	# return int
+	def countLineWhitespace(self, line, type):
+		return len(line) - len(line.lstrip(type))
+
+	def buildScaffold(self, lines, spacingCount, spacingType):
+		scaffold = []
+		
+		for index, line in enumerate(lines):
+			currentWs = self.countLineWhitespace(line, spacingType)
+			if index < len(lines) - 1:
+				nextWs = self.countLineWhitespace(lines[index + 1], spacingType)
+			replacement = 'describe(\'' + line.lstrip(spacingType) + '\', function() {\n'
+			indented = replacement.rjust(len(replacement) + currentWs, spacingType)
+			scaffold.append(indented)
+		return scaffold
 
 	# main
 	def run(self, edit):
+		lines = []
+
+		# create a region from the first sel to the last
+		region = sublime.Region(0, self.view.size())
+		file = self.view.substr(region)		
+
+		# create an array of lines
+		for line in file.splitlines():
+			lines.append(line)
+
+		if self.translatingTabsToSpaces():				
+			scaffolded = self.buildScaffold(lines, self.spacingSetting(), ' ')			
+		else:
+			scaffolded = self.buildScaffold(lines, self.spacingSetting(), '\t')
 
 		settings = self.view.settings()
 		spaceSize = settings.get('tab_size')
 		tabsToSpaces = settings.get('translate_tabs_to_spaces')
 
-		lines = []
 		newLines = []
-
-		# create a region from the first sel to the last
-		region = sublime.Region(0, self.view.size())
-		file = self.view.substr(region)
 
 		# create an array of lines
 		for line in file.splitlines():
@@ -40,11 +60,11 @@ class JasmineScaffoldCommand(sublime_plugin.TextCommand):
 		# loop through each line
 		for index, line in enumerate(lines):
 			# number of whitespace at start of line
-			currentWhitespace = self.countWhitespace(line)
+			currentWhitespace = self.countLineWhitespace(line, ' ')
 
 			# the whitespace of the next line or -1 if the last line
 			if index < len(lines)-1:
-				nextWhitespace = self.countWhitespace(lines[index + 1])
+				nextWhitespace = self.countLineWhitespace(lines[index + 1], ' ')
 			else:
 				nextWhitespace = -1
 
@@ -52,7 +72,7 @@ class JasmineScaffoldCommand(sublime_plugin.TextCommand):
 			if index == 0:
 				previousWhitespace = -1
 			else:
-				previousWhitespace = self.countWhitespace(lines[index - 1])
+				previousWhitespace = self.countLineWhitespace(lines[index - 1], ' ')
 
 			# if the previous line is more indented than the current one
 			# we know that there is a new describe block and need to close
@@ -85,10 +105,4 @@ class JasmineScaffoldCommand(sublime_plugin.TextCommand):
 					newLines.append('});'.rjust(3 + acpy) + '\n\n')
 
 		# replace the whole view with the joined array we've just created
-		self.view.replace(edit, region, ''.join(newLines))
-
-	# yay, some modularity
-	def countWhitespace(self, line):
-		settings = self.view.settings()
-		tabsToSpaces = settings.get('translate_tabs_to_spaces')
-		return len(line) - len(line.lstrip(' ' if tabsToSpaces else '\t'))
+		self.view.replace(edit, region, ''.join(scaffolded))
