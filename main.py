@@ -4,45 +4,50 @@ import sublime_plugin
 class JasmineScaffoldCommand(sublime_plugin.TextCommand):
 
     # whether tabs are being translated to spaces or not
-    # return boolean
+    # return [bool]
 	def translatingTabsToSpaces(self):
 		return self.view.settings().get('translate_tabs_to_spaces')
 
 	# counts the spacing being used
-	# return int
+	# return [int]
 	def spacingSetting(self):
 		return self.view.settings().get('tab_size')
 
 	# count the number of whitespace characters at the start of each line
-	# return int
+	# return [int]
 	def countLineWhitespace(self, line, type):
 		return len(line) - len(line.lstrip(type))
 
-	def buildScaffold(self, lines, spacingCount, spacingType):
+	# param [list] lines read from file in focus
+	# param [int] spacingCount tab/space size
+	# param [str] spacingType space or tab character
+	# param [bool] usingSpaces current user setting, spaces or tabs
+	# todo refactor out into smaller chunks
+	# return [list] scaffold
+	def buildScaffold(self, lines, spacingCount, spacingType, usingSpaces):
 		scaffold = []
 
 		for index, line in enumerate(lines):
-			currentWs = self.countLineWhitespace(line, spacingType)
+			currentWhitespace = self.countLineWhitespace(line, spacingType)
 
 			if index < len(lines) - 1:
-				nextWs = self.countLineWhitespace(lines[index + 1], spacingType)
+				nextWhitespace = self.countLineWhitespace(lines[index + 1], spacingType)
 			else:
-				nextWs = 0
+				nextWhitespace = 0
 
-			replacement = 'describe(\'' + line.lstrip(spacingType) + '\', function() {\n\n'
-			indented = replacement.rjust(len(replacement) + currentWs, spacingType)
+			descRepl = 'describe(\'' + line.lstrip(spacingType) + '\', function() {\n\n'
+			indented = descRepl.rjust(len(descRepl) + currentWhitespace, spacingType)
 
-			if currentWs > nextWs:
-				replacement = 'it(\'' + line.lstrip(spacingType) + '\', function() {\n\n'
-				copy = currentWs
+			if currentWhitespace > nextWhitespace:
+				itRepl = 'it(\'' + line.lstrip(spacingType) + '\', function() {\n\n'
+				copy = currentWhitespace
 				indented = []
 
-				indented.extend(replacement.rjust(len(replacement) + currentWs, spacingType) + '});'.rjust(3 + currentWs, spacingType) + '\n\n')
-
-				while copy > nextWs:
-					copy -= spacingCount
+				indented.append(itRepl.rjust(len(itRepl) + currentWhitespace, spacingType) + '});'.rjust(3 + currentWhitespace, spacingType) + '\n\n')
+				while copy > nextWhitespace:
+					copy -= spacingCount if usingSpaces else 1
 					closeBrackets = '});'.rjust(3 + copy, spacingType) + '\n\n'
-					indented.extend(closeBrackets)
+					indented.append(closeBrackets)
 
 			scaffold.extend(indented)
 
@@ -61,9 +66,9 @@ class JasmineScaffoldCommand(sublime_plugin.TextCommand):
 			lines.append(line)
 
 		if self.translatingTabsToSpaces():
-			scaffolded = self.buildScaffold(lines, self.spacingSetting(), ' ')
+			scaffolded = self.buildScaffold(lines, self.spacingSetting(), ' ', True)
 		else:
-			scaffolded = self.buildScaffold(lines, self.spacingSetting(), '\t')
+			scaffolded = self.buildScaffold(lines, self.spacingSetting(), '\t', False)	
 
 		# replace the whole view with the joined array we've just created
 		self.view.replace(edit, region, ''.join(scaffolded))
