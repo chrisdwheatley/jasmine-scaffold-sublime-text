@@ -3,6 +3,9 @@ import sublime_plugin
 
 class JasmineScaffoldCommand(sublime_plugin.TextCommand):
 
+	DESCRIBE_LINE = 'describe(\'%s\', function() {\n\n'
+	IT_LINE = 'it(\'%s\', function() {\n\n'
+
     # whether tabs are being translated to spaces or not
     # @return {bool}
 	def translatingTabsToSpaces(self):
@@ -29,6 +32,7 @@ class JasmineScaffoldCommand(sublime_plugin.TextCommand):
 		scaffold = []
 
 		for index, line in enumerate(lines):
+			lineText = line.lstrip(spacingType)
 			currentWhitespace = self.countLineWhitespace(line, spacingType)
 
 			if index < len(lines) - 1:
@@ -36,18 +40,18 @@ class JasmineScaffoldCommand(sublime_plugin.TextCommand):
 			else:
 				nextWhitespace = 0
 
-			descRepl = 'describe(\'' + line.lstrip(spacingType) + '\', function() {\n\n'
+			descRepl = self.DESCRIBE_LINE % lineText
 			indented = descRepl.rjust(len(descRepl) + currentWhitespace, spacingType)
 
 			if currentWhitespace > nextWhitespace:
-				itRepl = 'it(\'' + line.lstrip(spacingType) + '\', function() {\n\n'
-				copy = currentWhitespace
+				itRepl = self.IT_LINE % lineText
+				decreasingWhitespace = currentWhitespace
 				indented = []
 
 				indented.append(itRepl.rjust(len(itRepl) + currentWhitespace, spacingType) + '});'.rjust(3 + currentWhitespace, spacingType) + '\n\n')
-				while copy > nextWhitespace:
-					copy -= spacingCount if usingSpaces else 1
-					closeBrackets = '});'.rjust(3 + copy, spacingType) + '\n\n'
+				while decreasingWhitespace > nextWhitespace:
+					decreasingWhitespace -= spacingCount if usingSpaces else 1
+					closeBrackets = '});'.rjust(3 + decreasingWhitespace, spacingType) + '\n\n'
 					indented.append(closeBrackets)
 
 			scaffold.extend(indented)
