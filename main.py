@@ -4,26 +4,27 @@ import sublime_plugin
 class JasmineScaffoldCommand(sublime_plugin.TextCommand):
 
     # whether tabs are being translated to spaces or not
-    # return [bool]
+    # @return {bool}
 	def translatingTabsToSpaces(self):
 		return self.view.settings().get('translate_tabs_to_spaces')
 
 	# counts the spacing being used
-	# return [int]
+	# @return {int}
 	def spacingSetting(self):
 		return self.view.settings().get('tab_size')
 
 	# count the number of whitespace characters at the start of each line
-	# return [int]
+	# @return {int}
 	def countLineWhitespace(self, line, type):
 		return len(line) - len(line.lstrip(type))
 
-	# param [list] lines read from file in focus
-	# param [int] spacingCount tab/space size
-	# param [str] spacingType space or tab character
-	# param [bool] usingSpaces current user setting, spaces or tabs
-	# todo refactor out into smaller chunks
-	# return [list] scaffold
+	# build an array of lines to output
+	# @todo refactor out into smaller chunks
+	# @param {list} lines read from file in focus
+	# @param {int} spacingCount tab/space size
+	# @param {str} spacingType space or tab character
+	# @param {bool} usingSpaces current user setting, spaces or tabs	
+	# @return {list} scaffold
 	def buildScaffold(self, lines, spacingCount, spacingType, usingSpaces):
 		scaffold = []
 
@@ -53,7 +54,7 @@ class JasmineScaffoldCommand(sublime_plugin.TextCommand):
 
 		return scaffold
 
-	# main
+	# main, triggered when shortcut keys are pressed
 	def run(self, edit):
 		lines = []
 
@@ -65,6 +66,7 @@ class JasmineScaffoldCommand(sublime_plugin.TextCommand):
 		for line in file.splitlines():
 			lines.append(line)
 
+		# build the scaffolded tests, either for tab or space settings
 		if self.translatingTabsToSpaces():
 			scaffolded = self.buildScaffold(lines, self.spacingSetting(), ' ', True)
 		else:
