@@ -19,7 +19,7 @@ a unit of code
 	* <kbd>Ctrl</kbd> <kbd>Alt</kbd> <kbd>Shift</kbd> + <kbd>J</kbd> for Windows & Linux users
 	* Right click within the file editor area and click 'Run Jasmine Scaffold'
 
-Your specification will immediately be formatted as required by Jasmine ready for tests to be added.
+Your specification will immediately be formatted into JavaScript code ready for tests to be added.
 
 ```javascript
 describe('a unit of code', function() {
