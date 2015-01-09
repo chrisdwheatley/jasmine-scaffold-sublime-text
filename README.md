@@ -15,9 +15,9 @@ a unit of code
 ```
 
 * Run Jasmine Scaffold:
-	* `CMD + ALT + SHIFT + J` for OSX users
-	* `CTRL + ALT + SHIFT + J` for Windows & Linux users
-	* Right click the file and click `Run Jasmine Scaffold`
+	* <kbd>Cmd</kbd> <kbd>Alt</kbd> <kbd>Shift</kbd> + <kbd>J</kbd> for OSX users
+	* <kbd>Ctrl</kbd> <kbd>Alt</kbd> <kbd>Shift</kbd> + <kbd>J</kbd> for Windows & Linux users
+	* Right click within the file editor area and click 'Run Jasmine Scaffold'
 
 Your specification will immediately be formatted as required by Jasmine ready for tests to be added.
 
