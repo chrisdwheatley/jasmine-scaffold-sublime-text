@@ -1,3 +1,6 @@
 [
-    { "keys": ["ctrl+alt+shift+j"], "command": "jasmine_scaffold" }
+    {
+    	"keys": ["ctrl+alt+shift+j"],
+    	"command": "jasmine_scaffold"
+    }
 ]

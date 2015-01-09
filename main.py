@@ -6,8 +6,8 @@ class JasmineScaffoldCommand(sublime_plugin.TextCommand):
 	DESCRIBE_LINE = 'describe(\'%s\', function() {\n\n'
 	IT_LINE = 'it(\'%s\', function() {\n\n'
 
-    # whether tabs are being translated to spaces or not
-    # @return {bool}
+	# whether tabs are being translated to spaces or not
+	# @return {bool}
 	def translatingTabsToSpaces(self):
 		return self.view.settings().get('translate_tabs_to_spaces')
 
