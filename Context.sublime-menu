@@ -1,7 +1,7 @@
 [
 	{
 	    "id" : "jasmine_scaffold",
-	    "caption" : "Scaffold Jasmine Tests",
+	    "caption" : "Run Jasmine Scaffold",
 	    "command" : "jasmine_scaffold"
 	}
 ]
