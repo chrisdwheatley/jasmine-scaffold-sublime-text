@@ -1,6 +1,6 @@
 # Jasmine Scaffold
 
-A Sublime Text 3 plugin to help scaffold out your Jasmine tests without any JS.
+A Sublime Text 3 plugin to help scaffold out your Jasmine tests without the JS.
 
 ### Usage
 
