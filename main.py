@@ -1,10 +1,37 @@
+import os
+import sys
 import sublime
 import sublime_plugin
 
-class JasmineScaffoldCommand(sublime_plugin.TextCommand):
+directory = os.path.dirname(os.path.realpath(__file__))
+src_path = os.path.join(directory, "src")
+is_py2k = sys.version_info < (3, 0)
 
-	DESCRIBE_LINE = 'describe(\'%s\', function() {\n\n'
-	IT_LINE = 'it(\'%s\', function() {\n\n'
+# Python 2.x on Windows can't properly import from non-ASCII paths, so
+# this code added the DOC 8.3 version of the lib folder to the path in
+# case the user's username includes non-ASCII characters
+def add_lib_path(lib_path):
+	def _try_get_short_path(path):
+		path = os.path.normpath(path)
+		if is_py2k and os.name == 'nt' and isinstance(path, unicode):
+			try:
+				import locale
+				path = path.encode(locale.getpreferredencoding())
+			except:
+				from ctypes import windll, create_unicode_buffer
+				buf = create_unicode_buffer(512)
+				if windll.kernel32.GetShortPathNameW(path, buf, len(buf)):
+					path = buf.value
+		return path
+	lib_path = _try_get_short_path(lib_path)
+	if lib_path not in sys.path:
+		sys.path.append(lib_path)
+
+add_lib_path(src_path)
+
+from transform import transform
+
+class JasmineScaffoldCommand(sublime_plugin.TextCommand):
 
 	# whether tabs are being translated to spaces or not
 	# @return {bool}
@@ -15,48 +42,6 @@ class JasmineScaffoldCommand(sublime_plugin.TextCommand):
 	# @return {int}
 	def spacingSetting(self):
 		return self.view.settings().get('tab_size')
-
-	# count the number of whitespace characters at the start of each line
-	# @return {int}
-	def countLineWhitespace(self, line, type):
-		return len(line) - len(line.lstrip(type))
-
-	# build an array of lines to output
-	# @todo refactor out into smaller chunks
-	# @param {list} lines read from file in focus
-	# @param {int} spacingCount tab/space size
-	# @param {str} spacingType space or tab character
-	# @param {bool} usingSpaces current user setting, spaces or tabs	
-	# @return {list} scaffold
-	def buildScaffold(self, lines, spacingCount, spacingType, usingSpaces):
-		scaffold = []
-
-		for index, line in enumerate(lines):
-			lineText = line.lstrip(spacingType)
-			currentWhitespace = self.countLineWhitespace(line, spacingType)
-
-			if index < len(lines) - 1:
-				nextWhitespace = self.countLineWhitespace(lines[index + 1], spacingType)
-			else:
-				nextWhitespace = 0
-
-			descRepl = self.DESCRIBE_LINE % lineText
-			indented = descRepl.rjust(len(descRepl) + currentWhitespace, spacingType)
-
-			if currentWhitespace > nextWhitespace:
-				itRepl = self.IT_LINE % lineText
-				decreasingWhitespace = currentWhitespace
-				indented = []
-
-				indented.append(itRepl.rjust(len(itRepl) + currentWhitespace, spacingType) + '});'.rjust(3 + currentWhitespace, spacingType) + '\n\n')
-				while decreasingWhitespace > nextWhitespace:
-					decreasingWhitespace -= spacingCount if usingSpaces else 1
-					closeBrackets = '});'.rjust(3 + decreasingWhitespace, spacingType) + '\n\n'
-					indented.append(closeBrackets)
-
-			scaffold.extend(indented)
-
-		return scaffold
 
 	# main, triggered when shortcut keys are pressed
 	def run(self, edit):
@@ -72,9 +57,9 @@ class JasmineScaffoldCommand(sublime_plugin.TextCommand):
 
 		# build the scaffolded tests, either for tab or space settings
 		if self.translatingTabsToSpaces():
-			scaffolded = self.buildScaffold(lines, self.spacingSetting(), ' ', True)
+			scaffolded = transform().buildScaffold(lines, self.spacingSetting(), ' ', True)
 		else:
-			scaffolded = self.buildScaffold(lines, self.spacingSetting(), '\t', False)	
+			scaffolded = transform().buildScaffold(lines, self.spacingSetting(), '\t', False)	
 
 		# replace the whole view with the joined array we've just created
 		self.view.replace(edit, region, ''.join(scaffolded))
