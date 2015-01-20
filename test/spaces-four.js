@@ -2,6 +2,7 @@ a suite
     when b
         when c
             should d
+            should d2
     when e
         should f
     when g

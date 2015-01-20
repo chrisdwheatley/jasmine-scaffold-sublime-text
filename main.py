@@ -43,7 +43,7 @@ class JasmineScaffoldCommand(sublime_plugin.TextCommand):
 			descRepl = self.DESCRIBE_LINE % lineText
 			indented = descRepl.rjust(len(descRepl) + currentWhitespace, spacingType)
 
-			if currentWhitespace > nextWhitespace:
+			if currentWhitespace >= nextWhitespace:
 				itRepl = self.IT_LINE % lineText
 				decreasingWhitespace = currentWhitespace
 				indented = []
