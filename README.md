@@ -17,7 +17,9 @@ a unit of code
 * Run Jasmine Scaffold:
 	* <kbd>Cmd</kbd> <kbd>Alt</kbd> <kbd>Shift</kbd> + <kbd>J</kbd> for OSX users
 	* <kbd>Ctrl</kbd> <kbd>Alt</kbd> <kbd>Shift</kbd> + <kbd>J</kbd> for Windows & Linux users
-	or
+	
+		or
+	
 	* Right click within the file editor area and click 'Run Jasmine Scaffold'
 
 Your specification will immediately be formatted into JavaScript code ready for tests to be added. e.g.
