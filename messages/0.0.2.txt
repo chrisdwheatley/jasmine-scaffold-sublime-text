@@ -1,5 +1,6 @@
-Jasmine Scaffold 0.0.2 Release Notes
+
+0.0.2 Release Notes
 
 Bug Fixes
 
-- Fixed an issue where multiple 'it' block weren't being correctly formatted within a single 'describe' block (https://github.com/swirlycheetah/jasmine-scaffold-sublime-text/issues/3)
+	- Fixed an issue where multiple 'it' block weren't being correctly formatted within a single 'describe' block (https://github.com/swirlycheetah/jasmine-scaffold-sublime-text/issues/3)
