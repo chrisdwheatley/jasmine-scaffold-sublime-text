@@ -4,3 +4,5 @@
 Bug Fixes
 
 	- Fixed an issue where multiple 'it' block weren't being correctly formatted within a single 'describe' block (https://github.com/swirlycheetah/jasmine-scaffold-sublime-text/issues/3)
+
+Note: You may need to restart Sublime Text for these changes to take effect.
