@@ -38,7 +38,7 @@ class JasmineScaffoldCommand(sublime_plugin.TextCommand):
 			if index < len(lines) - 1:
 				nextWhitespace = self.countLineWhitespace(lines[index + 1], spacingType)
 			else:
-				nextWhitespace = 0
+				nextWhitespace = self.countLineWhitespace(lines[0], spacingType)
 
 			descRepl = self.DESCRIBE_LINE % lineText
 			indented = descRepl.rjust(len(descRepl) + currentWhitespace, spacingType)
@@ -58,12 +58,30 @@ class JasmineScaffoldCommand(sublime_plugin.TextCommand):
 
 		return scaffold
 
+	# get the start of a selected region
+	def getSelectedRegionStart(self, view, point):
+		lineRegion = view.line(point)
+		pos = lineRegion.a
+		end = lineRegion.b
+		while pos < end:
+			ch = view.substr(pos)
+			if ch != ' ' and ch != '\t':
+				break
+			pos += 1
+		return pos
+
 	# main, triggered when shortcut keys are pressed
 	def run(self, edit):
 		lines = []
 
 		# create a region from the first sel to the last
-		region = sublime.Region(0, self.view.size())
+		if len(self.view.sel()[0]) == 0:
+			region = sublime.Region(0, self.view.size())
+		else:
+			for sel in self.view.sel():
+				start = self.getSelectedRegionStart(self.view, min(sel.a, sel.b))
+				region = sublime.Region(self.view.line(start).a, self.view.line(max(sel.a, sel.b)).b)
+
 		file = self.view.substr(region)
 
 		# create an array of lines
