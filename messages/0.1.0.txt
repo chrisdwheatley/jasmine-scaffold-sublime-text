@@ -1,8 +1,10 @@
 
 0.1.0 Release Notes
 
-Feature
+Features
 
-  - You can now run Jasmine Scaffold on selected areas of text (https://github.com/swirlycheetah/jasmine-scaffold-sublime-text/issues/2)
+	- You can now run Jasmine Scaffold on selected areas of text (https://github.com/swirlycheetah/jasmine-scaffold-sublime-text/issues/2)
+	- OSX Users:
+		You can now use the keyboard shortcut CMD + CTRL + SHIFT + J to run Jasmine Scaffold. CMD + ALT + SHIFT + J is still usable but should be considered deprecated and may be removed in a future release. This change is to make keyboard shortcuts more consistent across all platforms.
 
 Note: You may need to restart Sublime Text for these changes to take effect.
