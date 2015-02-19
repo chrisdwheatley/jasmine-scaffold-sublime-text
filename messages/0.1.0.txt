@@ -1,0 +1,8 @@
+
+0.1.0 Release Notes
+
+Feature
+
+  - You can now run Jasmine Scaffold on selected areas of text (https://github.com/swirlycheetah/jasmine-scaffold-sublime-text/issues/2)
+
+Note: You may need to restart Sublime Text for these changes to take effect.
