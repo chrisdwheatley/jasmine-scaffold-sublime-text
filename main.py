@@ -65,7 +65,7 @@ class JasmineScaffoldCommand(sublime_plugin.TextCommand):
 		end = lineRegion.b
 		while pos < end:
 			ch = view.substr(pos)
-			if ch != ' ' and ch != '\t':
+			if ch != self.spacingSetting():
 				break
 			pos += 1
 		return pos
@@ -92,7 +92,7 @@ class JasmineScaffoldCommand(sublime_plugin.TextCommand):
 		if self.translatingTabsToSpaces():
 			scaffolded = self.buildScaffold(lines, self.spacingSetting(), ' ', True)
 		else:
-			scaffolded = self.buildScaffold(lines, self.spacingSetting(), '\t', False)	
+			scaffolded = self.buildScaffold(lines, self.spacingSetting(), '\t', False)
 
 		# replace the whole view with the joined array we've just created
 		self.view.replace(edit, region, ''.join(scaffolded))
