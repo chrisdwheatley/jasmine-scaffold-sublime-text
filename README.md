@@ -15,7 +15,7 @@ a unit of code
 ```
 
 * Run Jasmine Scaffold (you can run for the whole file or highlight a selection of your file and run only for that):
-	* <kbd>Cmd</kbd> <kbd>Ctrl</kbd> <kbd>Shift</kbd> + <kbd>J</kbd> for OSX users
+	* <kbd>Ctrl</kbd> <kbd>Cmd</kbd> <kbd>Shift</kbd> + <kbd>J</kbd> for OSX users
 	* <kbd>Ctrl</kbd> <kbd>Alt</kbd> <kbd>Shift</kbd> + <kbd>J</kbd> for Windows & Linux users
 	
 		or
