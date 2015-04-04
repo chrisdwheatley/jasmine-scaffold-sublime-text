@@ -94,5 +94,8 @@ class JasmineScaffoldCommand(sublime_plugin.TextCommand):
 		else:
 			scaffolded = self.buildScaffold(lines, self.spacingSetting(), '\t', False)
 
+		# clear selected text
+		self.view.sel().clear()
+
 		# replace the whole view with the joined array we've just created
 		self.view.replace(edit, region, ''.join(scaffolded))
