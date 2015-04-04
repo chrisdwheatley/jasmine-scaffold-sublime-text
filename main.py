@@ -73,14 +73,17 @@ class JasmineScaffoldCommand(sublime_plugin.TextCommand):
 	# main, triggered when shortcut keys are pressed
 	def run(self, edit):
 		lines = []
+		fullFile = True
 
 		# create a region from the first sel to the last
 		if len(self.view.sel()[0]) == 0:
 			region = sublime.Region(0, self.view.size())
 		else:
+			fullFile = False
 			for sel in self.view.sel():
 				start = self.getSelectedRegionStart(self.view, min(sel.a, sel.b))
-				region = sublime.Region(self.view.line(start).a, self.view.line(max(sel.a, sel.b)).b)
+				selectionEnd = self.view.line(max(sel.a, sel.b)).b
+				region = sublime.Region(self.view.line(start).a, selectionEnd)
 
 		file = self.view.substr(region)
 
@@ -94,8 +97,9 @@ class JasmineScaffoldCommand(sublime_plugin.TextCommand):
 		else:
 			scaffolded = self.buildScaffold(lines, self.spacingSetting(), '\t', False)
 
-		# clear selected text
+		# move cursor to end of selected text or file
 		self.view.sel().clear()
+		self.view.sel().add(sublime.Region(self.view.size() if fullFile else selectionEnd))
 
 		# replace the whole view with the joined array we've just created
 		self.view.replace(edit, region, ''.join(scaffolded))
