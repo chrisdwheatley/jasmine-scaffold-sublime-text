@@ -1,105 +1,122 @@
 import sublime
 import sublime_plugin
 
+
 class JasmineScaffoldCommand(sublime_plugin.TextCommand):
 
-	DESCRIBE_LINE = 'describe(\'%s\', function() {\n\n'
-	IT_LINE = 'it(\'%s\', function() {\n\n'
+    DESCRIBE_LINE = 'describe(\'%s\', function() {\n\n'
+    IT_LINE = 'it(\'%s\', function() {\n\n'
 
-	# whether tabs are being translated to spaces or not
-	# @return {bool}
-	def translatingTabsToSpaces(self):
-		return self.view.settings().get('translate_tabs_to_spaces')
+    def translatingTabsToSpaces(self):
+        """Decide whether tabs are being translates to spaces or not."""
+        return self.view.settings().get('translate_tabs_to_spaces')
 
-	# counts the spacing being used
-	# @return {int}
-	def spacingSetting(self):
-		return self.view.settings().get('tab_size')
+    def spacingSetting(self):
+        """Count the spacing being used."""
+        return self.view.settings().get('tab_size')
 
-	# count the number of whitespace characters at the start of each line
-	# @return {int}
-	def countLineWhitespace(self, line, type):
-		return len(line) - len(line.lstrip(type))
+    def countLineWhitespace(self, line, type):
+        """Count the number of whitespace characters at the start of a line.
 
-	# build an array of lines to output
-	# @todo refactor out into smaller chunks
-	# @param {list} lines read from file in focus
-	# @param {int} spacingCount tab/space size
-	# @param {str} spacingType space or tab character
-	# @param {bool} usingSpaces current user setting, spaces or tabs
-	# @return {list} scaffold
-	def buildScaffold(self, lines, spacingCount, spacingType, usingSpaces):
-		scaffold = []
+        Keyword arguments:
+        self -- self
+        line -- the line to count on
+        type -- the type of spacing being used
+        """
+        return len(line) - len(line.lstrip(type))
 
-		for index, line in enumerate(lines):
-			lineText = line.lstrip(spacingType)
-			currentWhitespace = self.countLineWhitespace(line, spacingType)
+    def getSelectedRegionStart(self, view, point):
+        """Get the start of the region selected."""
+        lineRegion = view.line(point)
+        pos = lineRegion.a
+        end = lineRegion.b
+        while pos < end:
+            ch = view.substr(pos)
+            if ch != self.spacingSetting():
+                break
+            pos += 1
+        return pos
 
-			if index < len(lines) - 1:
-				nextWhitespace = self.countLineWhitespace(lines[index + 1], spacingType)
-			else:
-				nextWhitespace = self.countLineWhitespace(lines[0], spacingType)
+    def buildScaffold(self, lines, spacingCount, spacingType, usingSpaces):
+        """Build an array of lines to output to the file.
 
-			descRepl = self.DESCRIBE_LINE % lineText
-			indented = descRepl.rjust(len(descRepl) + currentWhitespace, spacingType)
+        Keyword arguments:
+        self -- self
+        lines -- the lines read from file or selection
+        spacingCount -- the tab/space size being used
+        spaingType -- space or tab character to input
+        usingSpaces -- current user settings, spaces or tabs
+        """
+        scaffold = []
 
-			if currentWhitespace >= nextWhitespace:
-				itRepl = self.IT_LINE % lineText
-				decreasingWhitespace = currentWhitespace
-				indented = []
+        for index, line in enumerate(lines):
+            lineText = line.lstrip(spacingType)
+            currentWhitespace = self.countLineWhitespace(line, spacingType)
 
-				indented.append(itRepl.rjust(len(itRepl) + currentWhitespace, spacingType) + '});'.rjust(3 + currentWhitespace, spacingType) + '\n\n')
-				while decreasingWhitespace > nextWhitespace:
-					decreasingWhitespace -= spacingCount if usingSpaces else 1
-					closeBrackets = '});'.rjust(3 + decreasingWhitespace, spacingType) + '\n\n'
-					indented.append(closeBrackets)
+            if index < len(lines) - 1:
+                nextWhitespace = self.countLineWhitespace(
+                    lines[index + 1], spacingType)
+            else:
+                nextWhitespace = self.countLineWhitespace(
+                    lines[0], spacingType)
 
-			scaffold.extend(indented)
+            descRepl = self.DESCRIBE_LINE % lineText
+            indented = descRepl.rjust(
+                len(descRepl) + currentWhitespace, spacingType)
 
-		return scaffold
+            if currentWhitespace >= nextWhitespace:
+                itRepl = self.IT_LINE % lineText
+                decreasingWhitespace = currentWhitespace
+                itReplIndent = itRepl.rjust(
+                    len(itRepl) + currentWhitespace, spacingType)
+                indented = []
+                indented.append(itReplIndent + '});'.rjust(
+                    3 + currentWhitespace, spacingType) + '\n\n')
+                while decreasingWhitespace > nextWhitespace:
+                    decreasingWhitespace -= spacingCount if usingSpaces else 1
+                    closeBrackets = '});'.rjust(
+                        3 + decreasingWhitespace, spacingType) + '\n\n'
+                    indented.append(closeBrackets)
 
-	# get the start of a selected region
-	def getSelectedRegionStart(self, view, point):
-		lineRegion = view.line(point)
-		pos = lineRegion.a
-		end = lineRegion.b
-		while pos < end:
-			ch = view.substr(pos)
-			if ch != self.spacingSetting():
-				break
-			pos += 1
-		return pos
+            scaffold.extend(indented)
 
-	# main, triggered when shortcut keys are pressed
-	def run(self, edit):
-		lines = []
-		fullFile = True
+        return scaffold
 
-		# create a region from the first sel to the last
-		if len(self.view.sel()[0]) == 0:
-			region = sublime.Region(0, self.view.size())
-		else:
-			fullFile = False
-			for sel in self.view.sel():
-				start = self.getSelectedRegionStart(self.view, min(sel.a, sel.b))
-				selectionEnd = self.view.line(max(sel.a, sel.b)).b
-				region = sublime.Region(self.view.line(start).a, selectionEnd)
+    def run(self, edit):
+        lines = []
+        fullFile = True
 
-		file = self.view.substr(region)
+        # Create a region from the first sel to the last.
+        if len(self.view.sel()[0]) == 0:
+            # Full file.
+            region = sublime.Region(0, self.view.size())
+        else:
+            # User selected part of file.
+            fullFile = False
+            for sel in self.view.sel():
+                start = self.getSelectedRegionStart(
+                    self.view, min(sel.a, sel.b))
+                selectionEnd = self.view.line(max(sel.a, sel.b)).b
+                region = sublime.Region(self.view.line(start).a, selectionEnd)
 
-		# create an array of lines
-		for line in file.splitlines():
-			lines.append(line)
+        file = self.view.substr(region)
 
-		# build the scaffolded tests, either for tab or space settings
-		if self.translatingTabsToSpaces():
-			scaffolded = self.buildScaffold(lines, self.spacingSetting(), ' ', True)
-		else:
-			scaffolded = self.buildScaffold(lines, self.spacingSetting(), '\t', False)
+        # Create an array of lines.
+        for line in file.splitlines():
+            lines.append(line)
 
-		# move cursor to end of selected text or file
-		self.view.sel().clear()
-		self.view.sel().add(sublime.Region(self.view.size() if fullFile else selectionEnd))
+        # Build the scaffolded tests, either for tab or space settings.
+        if self.translatingTabsToSpaces():
+            scaffolded = self.buildScaffold(
+                lines, self.spacingSetting(), ' ', True)
+        else:
+            scaffolded = self.buildScaffold(
+                lines, self.spacingSetting(), '\t', False)
 
-		# replace the whole view with the joined array we've just created
-		self.view.replace(edit, region, ''.join(scaffolded))
+        # Move cursor to end of selected text or file after transformation.
+        self.view.sel().clear()
+        self.view.sel().add(
+            sublime.Region(self.view.size() if fullFile else selectionEnd))
+
+        # Replace the whole view with the joined array we've just created.
+        self.view.replace(edit, region, ''.join(scaffolded))
