@@ -1,0 +1,8 @@
+
+0.1.1 Release Notes
+
+Bug Fixes
+
+	- Fixed an issue where the selected area was still highlighted after selected text transformation happened (https://github.com/swirlycheetah/jasmine-scaffold-sublime-text/issues/8)
+
+Note: You may need to restart Sublime Text for these changes to take effect.
