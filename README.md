@@ -49,16 +49,18 @@ describe('a unit of code', function() {
 
 ### Contributing
 
-Contributions are more than welcome, no matter how large or small. The workflow for working on the plugin for me is as follows (YMMV):
+Contributions are more than welcome, no matter how large or small. The workflow I used for working on the plugin as follows (YMMV):
 
-On your command line navigate to the packages folder for Sublime Text, which by default for Sublime Text 3 is located at `Users\”Username”\Library\Application Support\Sublime Text 3\Packages` on OSX and
+* On your command line navigate to the packages folder for Sublime Text, which by default for Sublime Text 3 is located at `Users\”Username”\Library\Application Support\Sublime Text 3\Packages` on OSX and
 `C:\Users\”Username”\AppData\Roaming\Sublime Text 3\Packages` on Windows.
 
-Fork the project within GitHub.
+* Fork the project within GitHub.
 
-Clone your fork & `cd` into it
+* Clone your fork & `cd` into it
 
-`git clone git@github.com:"Username"/jasmine-scaffold-sublime-text.git & cd jasmine-scaffold-sublime-text`
+```
+git clone git@github.com:"Username"/jasmine-scaffold-sublime-text.git & cd jasmine-scaffold-sublime-text
+```
 
 You'll then be able to test the plugin as you make changes directly in Sublime Text. There are sample files to test on within the `test` directory.
 
