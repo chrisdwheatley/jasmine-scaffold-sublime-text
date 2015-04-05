@@ -2,6 +2,14 @@
 
 A Sublime Text plugin to help scaffold out your [Jasmine](https://github.com/jasmine/jasmine) tests without the JS.
 
+### Installation
+
+You can install via [Sublime Package Control](https://packagecontrol.io/installation).
+
+Open 'Package Control: Install Package' in your Command Palette and search for 'jasmine scaffold'.
+
+The plugin should be picked up automatically. If not then you may need to restart Sublime Text.
+
 ### Usage
 
 * Write your specifications in plain English, indenting where required. e.g.
